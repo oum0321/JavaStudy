@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book45.mapper.QnaReplyMapper">
+
+<!-- 답변 등록 -->
+<insert id="enrollReply"> 	
+	insert into QNAREPLY(renum, qnum, id, content) values(QNAREPLY_SEQ.nextval, #{qnum}, #{id}, #{content})
+</insert>
+
+<!--  답변 페이징(?) -->
+<select id="getReplyList" resultType="com.book45.domain.QnaReplyDTO">
+	<![CDATA[
+		select * from(
+					select rownum as rn, renum, qnum, id, content, writeDate
+					from QNAREPLY 
+					where rownum <= #{pageNum} * #{amount} and qnum = #{qnum}
+					order by writeDate desc
+					)
+		where rn > (#{pageNum} -1) * #{amount}
+	]]>	
+</select>
+
+<!-- 댓글체크 부분 주석
+<select id="checkQnaReply" resultType="integer">
+	select NUM from QNAREPLY where id = #{id} and qnaNum = #{qnaNum}
+</select>  
+ -->
+ 
+ <!--  답변 총갯수 -->
+<select id="getReplyTotal" resultType="int">
+	select count(*) from QNAREPLY where qnum = #{qnum}	
+</select>
+<!--  답변 수정 -->
+<update id="updateReply">
+  	update qnareply set content = #{content} where renum = #{renum}
+</update>  	
+  	
+ <!-- 답변 한개 정보 (수정 페이지)-->
+<select id="getUpdateReply" resultType="com.book45.domain.QnaReplyDTO">
+	select * from qnareply where renum = #{renum}		
+</select> 	
+	
+<!--답변 삭제 -->
+<delete id="deleteReply">
+  	DELETE FROM QNAREPLY WHERE renum = #{renum}
+</delete>		
+
+<!-- 구버전
+
+<insert id="insert">
+	insert into qnareply(num, qNum, content, memberid) values(QNAREPLY_SEQ.nextval, #{qNum}, #{content}, #{id})
+</insert>
+
+<select id="read" resultType="com.book45.domain.QnaReplyVO">
+	select * from qnareply where num = #{num}
+</select>
+
+<delete id="delete">
+	delete from qnareply where num = #{num}
+</delete>
+
+<update id="update">
+	update qnareply set content = #{content}, updateDate = sysdate where num = #{num}
+</update>
+
+<select id="getListWithPaging" resultType="com.book45.domain.QnaReplyVO">
+<![CDATA[
+	select num, qNum, content, id, writeDate, updateDate 
+	from 
+	(
+	 select /*+ index(qnareply ipk_qnareply) */
+	 rownum rn, num, qNum, content, id, writeDate, updateDate
+	 from qnareply
+	 where qNum = #{qNum} and num >0 and rownum <= #{cri.pageNum} * #{cri.amount}
+	) 
+	where rn >(#{cri.pageNum}-1) *#{cri.amount}
+	
+	]]>
+</select>
+
+<select id="getCountByQnum" resultType="int">
+	
+	select count(num) from qnareply where qnum=#{qNum}
+
+</select> -->
+</mapper>
